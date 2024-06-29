@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weno</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wdth,wght@75..125,700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Fredoka', 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f8fc;
+            color: #333;
+        }
+
+        #app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        header {
+            background-color: white;
+            color: #5A56FF;
+            padding: 1.5rem;
+            text-align: left;
+            font-size: 45px;
+            position: absolute;
+            top: 19px;
+            left: 27px;
+            right: 1353px;
+            bottom: 944px;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            background: white;
+        }
+        
+        #chat-container {
+            background: white;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: row;
+            height: 80vh;
+        }
+
+        #channels {
+            background: #f8f8f8;
+            padding: 1rem;
+            align: left;
+            border-radius: 21px;
+            width: 239px;
+            height: 654px;
+            overflow-y: auto;
+            margin-right: 1rem; /* Added margin to create space between channels and messages */
+        }
+
+        #channels ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #channels li {
+            font-family: 'Roboto', sans-serif;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: #f8f8f8;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        #channels li:hover {
+            background: #e0e0e0; /* A tint from #fafafa */
+        }
+
+        #channels li.active {
+            background: #f0f0f0; /* A tint of #fafafa */
+        }
+
+        #add-channel {
+            display: flex;
+            flex-direction: column;
+            padding-top: 1rem;
+        }
+
+        #add-channel input {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        #add-channel button {
+            padding: 0.5rem;
+            background-color: #f8f8f8;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 1rem;
+        }
+
+        #add-channel button:hover {
+            background: #e0e0e0; /* A tint from #fafafa */
+        }
+
+        #messages-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-radius: 21px;
+            background: #f8f8f8;
+            align: centre;
+            width: 239px;
+            height: 654px;
+            margin-bottom: 40px
+        }
+
+        #messages {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            border-bottom: 1px solid #eee;
+        }
+
+        #message-input {
+            display: flex;
+            padding: 1rem;
+            border-top: 1px solid #eee;
+        }
+
+        #message-input input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+            margin-right: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        #message-input input:focus {
+            border-color: #5a56ff;
+            outline: none;
+        }
+
+        #message-input button {
+            padding: 0.75rem 1.5rem;
+            background-color: #5a56ff;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        #message-input button:hover {
+            background-color: #5a56ff;
+        }
+
+        .message {
+            font-family: 'Roboto', sans-serif;
+            margin-bottom: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 20px;
+            background-color: #333333;
+            font-size: 1rem;
+            max-width: 80%;
+            animation: fadeIn 0.5s;
+        }
+
+        .message.user {
+            background-color: #333333;
+            color: white;
+            align-self: flex-end;
+        }
+        
+        #topic-info {
+            width: 239;
+            height: 654;
+            background-color: #f8f8f8;
+            padding: 1rem;
+            border-radius: 21px;
+            margin-left: auto;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header>
+            Weno <!-- Updated header title to "Weno" -->
+        </header>
+        <main>
+            <div id="chat-container">
+                <div id="channels">
+                    <ul id="channelList">
+                        <li class="active" data-channel="general">General</li>
+                        <li data-channel="random">Random</li>
+                        <li data-channel="tech">Tech</li>
+                    </ul>
+                    <div id="add-channel">
+                        <input type="text" id="newChannelName" placeholder="New channel name">
+                        <button id="addChannelButton" style="font-family: Roboto, sans-serif; font-size: 16px; color: #333; padding: 5px 10px; background-color: #ddd; cursor: pointer;">Add Channel</button> 
+                    </div>
+                </div>
+                <div id="messages-container">
+                    <div id="messages">
+                        <!-- Messages will appear here -->
+                    </div>
+                    <div id="message-input">
+                        <input type="text" id="messageText" placeholder="Type your message...">
+                        <button id="sendButton">Send</button>
+                    </div>
+                </div> <!-- messages-container ends here -->
+                <div id="topic-info">
+                    <!-- Topic Info content goes here -->
+                </div> <!-- topic-info is now outside of messages-container -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const messagesContainer = document.getElementById("messages");
+            const sendButton = document.getElementById("sendButton");
+            const messageText = document.getElementById("messageText");
+            const channels = document.querySelectorAll("#channels li");
+            const addChannelButton = document.getElementById("addChannelButton");
+            const newChannelName = document.getElementById("newChannelName");
+            const channelList = document.getElementById("channelList");
+
+            let currentChannel = "general";
+            var previousChannel = currentChannel;
+            const messages = {
+                general: [],
+                random: [],
+                tech: []
+            };
+
+            channels.forEach(channel => {
+                channel.addEventListener("click", () => {
+                    switchChannel(channel.dataset.channel);
+                });
+            });
+
+            sendButton.addEventListener("click", () => {
+                sendMessage();
+            });
+
+            messageText.addEventListener("keypress", (event) => {
+                if (event.key === "Enter") {
+                    sendMessage();
+                }
+            });
+
+            addChannelButton.addEventListener("click", () => {
+                addNewChannel();
+            });
+
+            function switchChannel(channel) {
+                if (currentChannel !== channel) {
+                    previousChannel = currentChannel;
+                    currentChannel = channel;
+                    channels.forEach(c => c.classList.remove("active"));
+                    document.querySelector(`#channels li[data-channel="${channel}"]`).classList.add("active");
+                    document.querySelector(`#channels li[data-channel="${previousChannel}"]`).classList.remove("active");
+                    loadMessages();
+                }
+            }
+
+            function loadMessages() {
+                messagesContainer.innerHTML = "";
+                messages[currentChannel].forEach(text => {
+                    const messageElement = document.createElement("div");
+                    messageElement.classList.add("message", "user");
+                    messageElement.textContent = text;
+                    messagesContainer.appendChild(messageElement);
+                });
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            function sendMessage() {
+                const text = messageText.value.trim();
+                if (text !== "") {
+                    messages[currentChannel].push(text);
+                    const messageElement = document.createElement("div");
+                    messageElement.classList.add("message", "user");
+                    messageElement.textContent = text;
+                    messagesContainer.appendChild(messageElement);
+                    messageText.value = "";
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
+            }
+
+            function addNewChannel() {
+                const newChannel = newChannelName.value.trim();
+                if (newChannel !== "" && !messages.hasOwnProperty(newChannel)) {
+                    messages[newChannel] = [];
+                    const newChannelElement = document.createElement("li");
+                    newChannelElement.dataset.channel = newChannel;
+                    newChannelElement.textContent = newChannel;
+                    newChannelElement.addEventListener("click", () => {
+                        switchChannel(newChannel);
+                    });
+                    channelList.appendChild(newChannelElement);
+                    newChannelName.value = "";
+                    document.querySelector(`#channels li[data-channel="${newChannel}"]`).classList.remove("active");
+                }
+            }
+
+            document.addEventListener("DOMContentLoaded", () => {
+
+
+                loadMessages();
+            });})
+                </script> 
+                </html> 
