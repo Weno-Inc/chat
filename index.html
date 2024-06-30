@@ -274,8 +274,6 @@
             const addChannelButton = document.getElementById("addChannelButton");
             const newChannelName = document.getElementById("newChannelName");
             const channelList = document.getElementById("channelList");
-            const socket = io('http://localhost:3000'); // Replace with your server's URL if different
-
 
             let currentChannel = "general";
             var previousChannel = currentChannel;
@@ -333,7 +331,6 @@
                     messages[currentChannel].push(text);
                     const messageElement = document.createElement("div");
                     messageElement.classList.add("message", "user");
-                    socket.emit('message', message);
                     messageElement.textContent = text;
                     messagesContainer.appendChild(messageElement);
                     messageText.value = "";
@@ -356,16 +353,6 @@
                     document.querySelector(`#channels li[data-channel="${newChannel}"]`).classList.remove("active");
                 }
             }
-
-            socket.on('messages', (data) => {
-    // Display all received messages (update your UI here)
-    console.log('Received messages:', data);
-});
-
-socket.on('message', (msg) => {
-    // Display new messages as they arrive (update your UI here)
-    console.log('New message:', msg);
-});
 
 
             document.addEventListener("DOMContentLoaded", () => {
