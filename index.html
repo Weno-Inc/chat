@@ -36,6 +36,16 @@
             bottom: 944px;
         }
 
+.search-bar {
+  font-family: 'Roboto', sans-serif; /* Change font if desired */
+  background-color: #f8f8f8; /* Light gray background */
+  padding: 10px; /* Add some space around the input */
+  border: none; /* Remove default border */
+  border-radius: 21px; /* Rounded corners */
+  width: 100%; /* Stretch the bar to full width */
+  box-sizing: border-box; /* Include padding in width */
+}
+        
         main {
             flex: 1;
             display: flex;
@@ -207,17 +217,6 @@
             padding: 0;
             margin: 0;
         }
-        
-.search-bar {
-  font-family: Arial, sans-serif; /* Change font if desired */
-  background-color: #f1f1f1; /* Light gray background */
-  padding: 10px; /* Add some space around the input */
-  border: none; /* Remove default border */
-  border-radius: 5px; /* Rounded corners */
-  width: 100%; /* Stretch the bar to full width */
-  box-sizing: border-box; /* Include padding in width */
-}
-
 
         @keyframes fadeIn {
             from {
@@ -235,6 +234,7 @@
     <div id="app">
         <header>
             Weno <!-- Updated header title to "Weno" -->
+            <input type="text" class="search-bar" placeholder="Search">
         </header>
         <main>
             <div id="chat-container">
@@ -262,9 +262,6 @@
                 <div id="topic-info"> 
                     <p style="font-size: 19px;"><<b>@weno</b></p>
                 </div> <!-- topic-info is now outside of messages-container -->
-    </div>
-</div>
-    <input type="text" class="search-bar" placeholder="Search">
 </body>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
